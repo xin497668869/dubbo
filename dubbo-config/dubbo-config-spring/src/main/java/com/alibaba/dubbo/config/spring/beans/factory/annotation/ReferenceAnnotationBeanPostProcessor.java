@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.config.spring.beans.factory.annotation;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.config.annotation.DubboReference;
 import com.alibaba.dubbo.config.spring.ReferenceBean;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -37,7 +37,7 @@ import static org.springframework.core.annotation.AnnotationUtils.getAnnotation;
 
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor} implementation
- * that Consumer service {@link Reference} annotated fields
+ * that Consumer service {@link DubboReference} annotated fields
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @since 2.5.7
@@ -73,14 +73,14 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
         } catch (BeanCreationException ex) {
             throw ex;
         } catch (Throwable ex) {
-            throw new BeanCreationException(beanName, "Injection of @Reference dependencies failed", ex);
+            throw new BeanCreationException(beanName, "Injection of @DubboReference dependencies failed", ex);
         }
         return pvs;
     }
 
 
     /**
-     * Finds {@link InjectionMetadata.InjectedElement} Metadata from annotated {@link Reference @Reference} fields
+     * Finds {@link InjectionMetadata.InjectedElement} Metadata from annotated {@link DubboReference @DubboReference} fields
      *
      * @param beanClass The {@link Class} of Bean
      * @return non-null {@link List}
@@ -93,18 +93,18 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
             @Override
             public void doWith(Field field) throws IllegalArgumentException, IllegalAccessException {
 
-                Reference reference = getAnnotation(field, Reference.class);
+                DubboReference dubboReference = getAnnotation(field, DubboReference.class);
 
-                if (reference != null) {
+                if (dubboReference != null) {
 
                     if (Modifier.isStatic(field.getModifiers())) {
                         if (logger.isWarnEnabled()) {
-                            logger.warn("@Reference annotation is not supported on static fields: " + field);
+                            logger.warn("@DubboReference annotation is not supported on static fields: " + field);
                         }
                         return;
                     }
 
-                    elements.add(new ReferenceFieldElement(field, reference));
+                    elements.add(new ReferenceFieldElement(field, dubboReference));
                 }
 
             }
@@ -115,7 +115,7 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
     }
 
     /**
-     * Finds {@link InjectionMetadata.InjectedElement} Metadata from annotated {@link Reference @Reference} methods
+     * Finds {@link InjectionMetadata.InjectedElement} Metadata from annotated {@link DubboReference @DubboReference} methods
      *
      * @param beanClass The {@link Class} of Bean
      * @return non-null {@link List}
@@ -134,23 +134,23 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
                     return;
                 }
 
-                Reference reference = findAnnotation(bridgedMethod, Reference.class);
+                DubboReference dubboReference = findAnnotation(bridgedMethod, DubboReference.class);
 
-                if (reference != null && method.equals(ClassUtils.getMostSpecificMethod(method, beanClass))) {
+                if (dubboReference != null && method.equals(ClassUtils.getMostSpecificMethod(method, beanClass))) {
                     if (Modifier.isStatic(method.getModifiers())) {
                         if (logger.isWarnEnabled()) {
-                            logger.warn("@Reference annotation is not supported on static methods: " + method);
+                            logger.warn("@DubboReference annotation is not supported on static methods: " + method);
                         }
                         return;
                     }
                     if (method.getParameterTypes().length == 0) {
                         if (logger.isWarnEnabled()) {
-                            logger.warn("@Reference  annotation should only be used on methods with parameters: " +
+                            logger.warn("@DubboReference  annotation should only be used on methods with parameters: " +
                                     method);
                         }
                     }
                     PropertyDescriptor pd = BeanUtils.findPropertyForMethod(bridgedMethod, beanClass);
-                    elements.add(new ReferenceMethodElement(method, pd, reference));
+                    elements.add(new ReferenceMethodElement(method, pd, dubboReference));
                 }
             }
         });
@@ -193,7 +193,7 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
                         this.injectionMetadataCache.put(cacheKey, metadata);
                     } catch (NoClassDefFoundError err) {
                         throw new IllegalStateException("Failed to introspect bean class [" + clazz.getName() +
-                                "] for reference metadata: could not find class that it depends on", err);
+                                "] for dubboReference metadata: could not find class that it depends on", err);
                     }
                 }
             }
@@ -244,18 +244,18 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
     }
 
     /**
-     * {@link Reference} {@link Method} {@link InjectionMetadata.InjectedElement}
+     * {@link DubboReference} {@link Method} {@link InjectionMetadata.InjectedElement}
      */
     private class ReferenceMethodElement extends InjectionMetadata.InjectedElement {
 
         private final Method method;
 
-        private final Reference reference;
+        private final DubboReference dubboReference;
 
-        protected ReferenceMethodElement(Method method, PropertyDescriptor pd, Reference reference) {
+        protected ReferenceMethodElement(Method method, PropertyDescriptor pd, DubboReference dubboReference) {
             super(method, pd);
             this.method = method;
-            this.reference = reference;
+            this.dubboReference = dubboReference;
         }
 
         @Override
@@ -263,7 +263,7 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
 
             Class<?> referenceClass = pd.getPropertyType();
 
-            Object referenceBean = buildReferenceBean(reference, referenceClass);
+            Object referenceBean = buildReferenceBean(dubboReference, referenceClass);
 
             ReflectionUtils.makeAccessible(method);
 
@@ -274,18 +274,18 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
     }
 
     /**
-     * {@link Reference} {@link Field} {@link InjectionMetadata.InjectedElement}
+     * {@link DubboReference} {@link Field} {@link InjectionMetadata.InjectedElement}
      */
     private class ReferenceFieldElement extends InjectionMetadata.InjectedElement {
 
         private final Field field;
 
-        private final Reference reference;
+        private final DubboReference dubboReference;
 
-        protected ReferenceFieldElement(Field field, Reference reference) {
+        protected ReferenceFieldElement(Field field, DubboReference dubboReference) {
             super(field, null);
             this.field = field;
-            this.reference = reference;
+            this.dubboReference = dubboReference;
         }
 
         @Override
@@ -293,7 +293,7 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
 
             Class<?> referenceClass = field.getType();
 
-            Object referenceBean = buildReferenceBean(reference, referenceClass);
+            Object referenceBean = buildReferenceBean(dubboReference, referenceClass);
 
             ReflectionUtils.makeAccessible(field);
 
@@ -303,16 +303,16 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
 
     }
 
-    private Object buildReferenceBean(Reference reference, Class<?> referenceClass) throws Exception {
+    private Object buildReferenceBean(DubboReference dubboReference, Class<?> referenceClass) throws Exception {
 
-        String referenceBeanCacheKey = generateReferenceBeanCacheKey(reference, referenceClass);
+        String referenceBeanCacheKey = generateReferenceBeanCacheKey(dubboReference, referenceClass);
 
         ReferenceBean<?> referenceBean = referenceBeansCache.get(referenceBeanCacheKey);
 
         if (referenceBean == null) {
 
             ReferenceBeanBuilder beanBuilder = ReferenceBeanBuilder
-                    .create(reference, classLoader, applicationContext)
+                    .create(dubboReference, classLoader, applicationContext)
                     .interfaceClass(referenceClass);
 
             referenceBean = beanBuilder.build();
@@ -329,33 +329,33 @@ public class ReferenceAnnotationBeanPostProcessor extends InstantiationAwareBean
     /**
      * Generate a cache key of {@link ReferenceBean}
      *
-     * @param reference {@link Reference}
+     * @param dubboReference {@link DubboReference}
      * @param beanClass {@link Class}
      * @return
      */
-    private static String generateReferenceBeanCacheKey(Reference reference, Class<?> beanClass) {
+    private static String generateReferenceBeanCacheKey(DubboReference dubboReference, Class<?> beanClass) {
 
-        String interfaceName = resolveInterfaceName(reference, beanClass);
+        String interfaceName = resolveInterfaceName(dubboReference, beanClass);
 
-        String key = reference.group() + "/" + interfaceName + ":" + reference.version();
+        String key = dubboReference.group() + "/" + interfaceName + ":" + dubboReference.version();
 
         return key;
 
     }
 
-    private static String resolveInterfaceName(Reference reference, Class<?> beanClass)
+    private static String resolveInterfaceName(DubboReference dubboReference, Class<?> beanClass)
             throws IllegalStateException {
 
         String interfaceName;
-        if (!"".equals(reference.interfaceName())) {
-            interfaceName = reference.interfaceName();
-        } else if (!void.class.equals(reference.interfaceClass())) {
-            interfaceName = reference.interfaceClass().getName();
+        if (!"".equals(dubboReference.interfaceName())) {
+            interfaceName = dubboReference.interfaceName();
+        } else if (!void.class.equals(dubboReference.interfaceClass())) {
+            interfaceName = dubboReference.interfaceClass().getName();
         } else if (beanClass.isInterface()) {
             interfaceName = beanClass.getName();
         } else {
             throw new IllegalStateException(
-                    "The @Reference undefined interfaceClass or interfaceName, and the property type "
+                    "The @DubboReference undefined interfaceClass or interfaceName, and the property type "
                             + beanClass.getName() + " is not a interface.");
         }
 

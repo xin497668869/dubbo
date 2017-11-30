@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.config.spring.context.annotation;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.config.annotation.DubboReference;
 import com.alibaba.dubbo.config.annotation.DubboService;
 import org.springframework.context.annotation.Import;
 
@@ -8,11 +8,11 @@ import java.lang.annotation.*;
 
 /**
  * Dubbo Component Scan {@link Annotation},scans the classpath for annotated components that will be auto-registered as
- * Spring beans. Dubbo-provided {@link DubboService} and {@link Reference}.
+ * Spring beans. Dubbo-provided {@link DubboService} and {@link DubboReference}.
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
  * @see DubboService
- * @see Reference
+ * @see DubboReference
  * @since 2.5.7
  */
 @Target(ElementType.TYPE)

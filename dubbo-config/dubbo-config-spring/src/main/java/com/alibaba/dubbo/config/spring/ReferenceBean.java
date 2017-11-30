@@ -21,7 +21,7 @@ import com.alibaba.dubbo.config.ModuleConfig;
 import com.alibaba.dubbo.config.MonitorConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
-import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.config.annotation.DubboReference;
 import com.alibaba.dubbo.config.spring.extension.SpringExtensionFactory;
 import com.alibaba.dubbo.config.support.Parameter;
 
@@ -52,8 +52,8 @@ public class ReferenceBean<T> extends ReferenceConfig<T> implements FactoryBean,
         super();
     }
 
-    public ReferenceBean(Reference reference) {
-        super(reference);
+    public ReferenceBean(DubboReference dubboReference) {
+        super(dubboReference);
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) {

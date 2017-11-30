@@ -30,8 +30,8 @@ import com.alibaba.dubbo.config.ProviderConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
+import com.alibaba.dubbo.config.annotation.DubboReference;
 import com.alibaba.dubbo.config.annotation.DubboService;
-import com.alibaba.dubbo.config.annotation.Reference;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -206,9 +206,9 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
                     && Modifier.isPublic(method.getModifiers())
                     && !Modifier.isStatic(method.getModifiers())) {
                 try {
-                    Reference reference = method.getAnnotation(Reference.class);
-                    if (reference != null) {
-                        Object value = refer(reference, method.getParameterTypes()[0]);
+                    DubboReference dubboReference = method.getAnnotation(DubboReference.class);
+                    if (dubboReference != null) {
+                        Object value = refer(dubboReference, method.getParameterTypes()[0]);
                         if (value != null) {
                             method.invoke(bean, new Object[]{value});
                         }
@@ -224,9 +224,9 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
                 if (!field.isAccessible()) {
                     field.setAccessible(true);
                 }
-                Reference reference = field.getAnnotation(Reference.class);
-                if (reference != null) {
-                    Object value = refer(reference, field.getType());
+                DubboReference dubboReference = field.getAnnotation(DubboReference.class);
+                if (dubboReference != null) {
+                    Object value = refer(dubboReference, field.getType());
                     if (value != null) {
                         field.set(bean, value);
                     }
@@ -238,51 +238,51 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
         return bean;
     }
 
-    private Object refer(Reference reference, Class<?> referenceClass) { //method.getParameterTypes()[0]
+    private Object refer(DubboReference dubboReference, Class<?> referenceClass) { //method.getParameterTypes()[0]
         String interfaceName;
-        if (!"".equals(reference.interfaceName())) {
-            interfaceName = reference.interfaceName();
-        } else if (!void.class.equals(reference.interfaceClass())) {
-            interfaceName = reference.interfaceClass().getName();
+        if (!"".equals(dubboReference.interfaceName())) {
+            interfaceName = dubboReference.interfaceName();
+        } else if (!void.class.equals(dubboReference.interfaceClass())) {
+            interfaceName = dubboReference.interfaceClass().getName();
         } else if (referenceClass.isInterface()) {
             interfaceName = referenceClass.getName();
         } else {
-            throw new IllegalStateException("The @Reference undefined interfaceClass or interfaceName, and the property type " + referenceClass.getName() + " is not a interface.");
+            throw new IllegalStateException("The @DubboReference undefined interfaceClass or interfaceName, and the property type " + referenceClass.getName() + " is not a interface.");
         }
-        String key = reference.group() + "/" + interfaceName + ":" + reference.version();
+        String key = dubboReference.group() + "/" + interfaceName + ":" + dubboReference.version();
         ReferenceBean<?> referenceConfig = referenceConfigs.get(key);
         if (referenceConfig == null) {
-            referenceConfig = new ReferenceBean<Object>(reference);
-            if (void.class.equals(reference.interfaceClass())
-                    && "".equals(reference.interfaceName())
+            referenceConfig = new ReferenceBean<Object>(dubboReference);
+            if (void.class.equals(dubboReference.interfaceClass())
+                    && "".equals(dubboReference.interfaceName())
                     && referenceClass.isInterface()) {
                 referenceConfig.setInterface(referenceClass);
             }
             if (applicationContext != null) {
                 referenceConfig.setApplicationContext(applicationContext);
-                if (reference.registry() != null && reference.registry().length > 0) {
+                if (dubboReference.registry() != null && dubboReference.registry().length > 0) {
                     List<RegistryConfig> registryConfigs = new ArrayList<RegistryConfig>();
-                    for (String registryId : reference.registry()) {
+                    for (String registryId : dubboReference.registry()) {
                         if (registryId != null && registryId.length() > 0) {
                             registryConfigs.add((RegistryConfig) applicationContext.getBean(registryId, RegistryConfig.class));
                         }
                     }
                     referenceConfig.setRegistries(registryConfigs);
                 }
-                if (reference.consumer() != null && reference.consumer().length() > 0) {
-                    referenceConfig.setConsumer((ConsumerConfig) applicationContext.getBean(reference.consumer(), ConsumerConfig.class));
+                if (dubboReference.consumer() != null && dubboReference.consumer().length() > 0) {
+                    referenceConfig.setConsumer((ConsumerConfig) applicationContext.getBean(dubboReference.consumer(), ConsumerConfig.class));
                 }
-                if (reference.monitor() != null && reference.monitor().length() > 0) {
-                    referenceConfig.setMonitor((MonitorConfig) applicationContext.getBean(reference.monitor(), MonitorConfig.class));
+                if (dubboReference.monitor() != null && dubboReference.monitor().length() > 0) {
+                    referenceConfig.setMonitor((MonitorConfig) applicationContext.getBean(dubboReference.monitor(), MonitorConfig.class));
                 }
-                if (reference.application() != null && reference.application().length() > 0) {
-                    referenceConfig.setApplication((ApplicationConfig) applicationContext.getBean(reference.application(), ApplicationConfig.class));
+                if (dubboReference.application() != null && dubboReference.application().length() > 0) {
+                    referenceConfig.setApplication((ApplicationConfig) applicationContext.getBean(dubboReference.application(), ApplicationConfig.class));
                 }
-                if (reference.module() != null && reference.module().length() > 0) {
-                    referenceConfig.setModule((ModuleConfig) applicationContext.getBean(reference.module(), ModuleConfig.class));
+                if (dubboReference.module() != null && dubboReference.module().length() > 0) {
+                    referenceConfig.setModule((ModuleConfig) applicationContext.getBean(dubboReference.module(), ModuleConfig.class));
                 }
-                if (reference.consumer() != null && reference.consumer().length() > 0) {
-                    referenceConfig.setConsumer((ConsumerConfig) applicationContext.getBean(reference.consumer(), ConsumerConfig.class));
+                if (dubboReference.consumer() != null && dubboReference.consumer().length() > 0) {
+                    referenceConfig.setConsumer((ConsumerConfig) applicationContext.getBean(dubboReference.consumer(), ConsumerConfig.class));
                 }
                 try {
                     referenceConfig.afterPropertiesSet();

@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.config.spring.beans.factory.annotation;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.config.annotation.DubboReference;
 import com.alibaba.dubbo.config.spring.api.DemoService;
 import com.alibaba.dubbo.config.spring.context.annotation.DubboComponentScan;
 import org.junit.Assert;
@@ -10,7 +10,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.ImportResource;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import org.springframework.stereotype.Component;
 
 /**
  * {@link ReferenceAnnotationBeanPostProcessor} Test
@@ -63,7 +62,7 @@ public class ReferenceAnnotationBeanPostProcessorTest {
             return demoServiceFromAncestor;
         }
 
-        @Reference(version = "1.2", url = "dubbo://127.0.0.1:12345")
+        @DubboReference(version = "1.2", url = "dubbo://127.0.0.1:12345")
         public void setDemoServiceFromAncestor(DemoService demoServiceFromAncestor) {
             this.demoServiceFromAncestor = demoServiceFromAncestor;
         }
@@ -77,7 +76,7 @@ public class ReferenceAnnotationBeanPostProcessorTest {
 
     private static class ParentBean extends AncestorBean {
 
-        @Reference(version = "1.2", url = "dubbo://127.0.0.1:12345")
+        @DubboReference(version = "1.2", url = "dubbo://127.0.0.1:12345")
         private DemoService demoServiceFromParent;
 
         public DemoService getDemoServiceFromParent() {
@@ -100,7 +99,7 @@ public class ReferenceAnnotationBeanPostProcessorTest {
             return demoService;
         }
 
-        @Reference(version = "1.2", url = "dubbo://127.0.0.1:12345")
+        @DubboReference(version = "1.2", url = "dubbo://127.0.0.1:12345")
         public void setDemoService(DemoService demoService) {
             this.demoService = demoService;
         }

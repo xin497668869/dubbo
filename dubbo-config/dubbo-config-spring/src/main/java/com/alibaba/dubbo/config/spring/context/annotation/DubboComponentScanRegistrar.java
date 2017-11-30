@@ -273,7 +273,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
      */
     private void registerReferenceAnnotationBeanPostProcessor(BeanDefinitionRegistry registry) {
 
-        // Register @Reference Annotation Bean Processor
+        // Register @DubboReference Annotation Bean Processor
         BeanRegistrar.registerInfrastructureBean(registry,
                 ReferenceAnnotationBeanPostProcessor.BEAN_NAME, ReferenceAnnotationBeanPostProcessor.class);
 

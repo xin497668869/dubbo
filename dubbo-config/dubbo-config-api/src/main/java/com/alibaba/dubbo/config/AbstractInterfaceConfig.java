@@ -112,7 +112,7 @@ public abstract class AbstractInterfaceConfig extends AbstractMethodConfig {
             }
         }
         if ((registries == null || registries.size() == 0)) {
-            throw new IllegalStateException((getClass().getSimpleName().startsWith("Reference")
+            throw new IllegalStateException((getClass().getSimpleName().startsWith("DubboReference")
                     ? "No such any registry to refer service in consumer "
                     : "No such any registry to export service in provider ")
                     + NetUtils.getLocalHost()

@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.config.spring.context.annotation.consumer;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.config.annotation.DubboReference;
 import com.alibaba.dubbo.config.spring.api.DemoService;
 import com.alibaba.dubbo.config.spring.context.annotation.DubboComponentScan;
 
@@ -21,7 +21,7 @@ import org.springframework.context.annotation.PropertySource;
 @PropertySource("META-INF/default.properties")
 public class ConsumerConfiguration {
 
-    @Reference(version = "2.5.7", url = "dubbo://127.0.0.1:12345")
+    @DubboReference(version = "2.5.7", url = "dubbo://127.0.0.1:12345")
     private DemoService demoService;
 
     public DemoService getDemoService() {
@@ -40,7 +40,7 @@ public class ConsumerConfiguration {
 
     public static abstract class Ancestor {
 
-        @Reference(version = "2.5.7", url = "dubbo://127.0.0.1:12345")
+        @DubboReference(version = "2.5.7", url = "dubbo://127.0.0.1:12345")
         private DemoService demoServiceFromAncestor;
 
         public DemoService getDemoServiceFromAncestor() {
@@ -60,7 +60,7 @@ public class ConsumerConfiguration {
             return demoServiceFromParent;
         }
 
-        @Reference(version = "2.5.7", url = "dubbo://127.0.0.1:12345")
+        @DubboReference(version = "2.5.7", url = "dubbo://127.0.0.1:12345")
         public void setDemoServiceFromParent(DemoService demoServiceFromParent) {
             this.demoServiceFromParent = demoServiceFromParent;
         }
@@ -69,7 +69,7 @@ public class ConsumerConfiguration {
 
     public static class Child extends Parent {
 
-        @Reference(version = "2.5.7", url = "dubbo://127.0.0.1:12345")
+        @DubboReference(version = "2.5.7", url = "dubbo://127.0.0.1:12345")
         private DemoService demoServiceFromChild;
 
         public DemoService getDemoServiceFromChild() {

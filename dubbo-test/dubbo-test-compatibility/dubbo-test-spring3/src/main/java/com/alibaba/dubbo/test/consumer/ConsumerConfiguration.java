@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.test.consumer;
 
-import com.alibaba.dubbo.config.annotation.Reference;
+import com.alibaba.dubbo.config.annotation.DubboReference;
 import com.alibaba.dubbo.config.spring.context.annotation.DubboComponentScan;
 import com.alibaba.dubbo.demo.DemoService;
 import org.springframework.context.annotation.Configuration;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.ImportResource;
 @DubboComponentScan
 public class ConsumerConfiguration {
 
-    @Reference(version = "2.5.8", url = "dubbo://127.0.0.1:12345")
+    @DubboReference(version = "2.5.8", url = "dubbo://127.0.0.1:12345")
     private DemoService demoService;
 
     public DemoService getDemoService() {
