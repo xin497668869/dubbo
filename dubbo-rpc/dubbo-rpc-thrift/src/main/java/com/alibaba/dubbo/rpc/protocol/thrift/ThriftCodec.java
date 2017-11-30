@@ -27,7 +27,6 @@ import com.alibaba.dubbo.rpc.RpcException;
 import com.alibaba.dubbo.rpc.RpcInvocation;
 import com.alibaba.dubbo.rpc.RpcResult;
 import com.alibaba.dubbo.rpc.protocol.thrift.io.RandomAccessByteArrayOutputStream;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.thrift.TApplicationException;
 import org.apache.thrift.TBase;
@@ -52,7 +51,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Thrift framed protocol codec.
- *
+ * <p>
  * <pre>
  * |<-                                  message header                                  ->|<- message body ->|
  * +----------------+----------------------+------------------+---------------------------+------------------+
@@ -60,12 +59,12 @@ import java.util.concurrent.atomic.AtomicInteger;
  * +----------------+----------------------+------------------+---------------------------+------------------+
  * |<-                                               message size                                          ->|
  * </pre>
- *
+ * <p>
  * <p>
  * <b>header fields in version 1</b>
  * <ol>
- *     <li>string - service name</li>
- *     <li>long   - dubbo request id</li>
+ * <li>string - service name</li>
+ * <li>long   - dubbo request id</li>
  * </ol>
  * </p>
  *
@@ -190,7 +189,7 @@ public class ThriftCodec implements Codec2 {
 
             if (StringUtils.isEmpty(argsClassName)) {
                 throw new RpcException(RpcException.SERIALIZATION_EXCEPTION,
-                        "The specified interface name incorrect.");
+                                       "The specified interface name incorrect.");
             }
 
             Class clazz = cachedClass.get(argsClassName);
@@ -268,8 +267,7 @@ public class ThriftCodec implements Codec2 {
             Request request = new Request(id);
             request.setData(result);
 
-            cachedRequest.putIfAbsent(id,
-                    RequestData.create(message.seqid, serviceName, message.name));
+            cachedRequest.put(id, RequestData.create(message.seqid, serviceName, message.name));
 
             return request;
 
@@ -426,8 +424,8 @@ public class ThriftCodec implements Codec2 {
 
         if (StringUtils.isEmpty(methodArgs)) {
             throw new RpcException(RpcException.SERIALIZATION_EXCEPTION,
-                    new StringBuilder(32).append(
-                            "Could not encode request, the specified interface may be incorrect.").toString());
+                                   new StringBuilder(32).append(
+                                           "Could not encode request, the specified interface may be incorrect.").toString());
         }
 
         Class<?> clazz = cachedClass.get(methodArgs);
@@ -544,7 +542,7 @@ public class ThriftCodec implements Codec2 {
 
         RpcResult result = (RpcResult) response.getResult();
 
-        RequestData rd = cachedRequest.get(response.getId());
+        RequestData rd = cachedRequest.remove(response.getId());
 
         String resultClassName = ExtensionLoader.getExtensionLoader(ClassNameGenerator.class).getExtension(
                 channel.getUrl().getParameter(ThriftConstants.CLASS_NAME_GENERATOR_KEY, ThriftClassNameGenerator.NAME))
@@ -552,8 +550,8 @@ public class ThriftCodec implements Codec2 {
 
         if (StringUtils.isEmpty(resultClassName)) {
             throw new RpcException(RpcException.SERIALIZATION_EXCEPTION,
-                    new StringBuilder(32).append(
-                            "Could not encode response, the specified interface may be incorrect.").toString());
+                                   new StringBuilder(32).append(
+                                           "Could not encode response, the specified interface may be incorrect.").toString());
         }
 
         Class clazz = cachedClass.get(resultClassName);
