@@ -24,7 +24,7 @@ import com.alibaba.dubbo.common.utils.ClassHelper;
 import com.alibaba.dubbo.common.utils.ConfigUtils;
 import com.alibaba.dubbo.common.utils.NamedThreadFactory;
 import com.alibaba.dubbo.common.utils.StringUtils;
-import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.alibaba.dubbo.config.support.Parameter;
 import com.alibaba.dubbo.rpc.Exporter;
 import com.alibaba.dubbo.rpc.Invoker;
@@ -95,8 +95,8 @@ public class ServiceConfig<T> extends AbstractServiceConfig {
     public ServiceConfig() {
     }
 
-    public ServiceConfig(Service service) {
-        appendAnnotation(Service.class, service);
+    public ServiceConfig(DubboService dubboService) {
+        appendAnnotation(DubboService.class, dubboService);
     }
 
     @Deprecated

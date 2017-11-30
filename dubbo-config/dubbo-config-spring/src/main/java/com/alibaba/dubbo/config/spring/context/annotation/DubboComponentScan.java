@@ -1,17 +1,17 @@
 package com.alibaba.dubbo.config.spring.context.annotation;
 
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.dubbo.config.annotation.DubboService;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
 
 /**
  * Dubbo Component Scan {@link Annotation},scans the classpath for annotated components that will be auto-registered as
- * Spring beans. Dubbo-provided {@link Service} and {@link Reference}.
+ * Spring beans. Dubbo-provided {@link DubboService} and {@link Reference}.
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see Service
+ * @see DubboService
  * @see Reference
  * @since 2.5.7
  */

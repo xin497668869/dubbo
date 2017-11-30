@@ -30,8 +30,8 @@ import com.alibaba.dubbo.config.ProviderConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
 import com.alibaba.dubbo.config.ServiceConfig;
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.alibaba.dubbo.config.annotation.Reference;
-import com.alibaba.dubbo.config.annotation.Service;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
@@ -95,7 +95,7 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
                 Object scanner = scannerClass.getConstructor(new Class<?>[]{BeanDefinitionRegistry.class, boolean.class}).newInstance(new Object[]{(BeanDefinitionRegistry) beanFactory, true});
                 // add filter
                 Class<?> filterClass = ReflectUtils.forName("org.springframework.core.type.filter.AnnotationTypeFilter");
-                Object filter = filterClass.getConstructor(Class.class).newInstance(Service.class);
+                Object filter = filterClass.getConstructor(Class.class).newInstance(DubboService.class);
                 Method addIncludeFilter = scannerClass.getMethod("addIncludeFilter", ReflectUtils.forName("org.springframework.core.type.filter.TypeFilter"));
                 addIncludeFilter.invoke(scanner, filter);
                 // scan packages
@@ -130,12 +130,12 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
         if (!isMatchPackage(bean)) {
             return bean;
         }
-        Service service = bean.getClass().getAnnotation(Service.class);
-        if (service != null) {
-            ServiceBean<Object> serviceConfig = new ServiceBean<Object>(service);
+        DubboService dubboService = bean.getClass().getAnnotation(DubboService.class);
+        if (dubboService != null) {
+            ServiceBean<Object> serviceConfig = new ServiceBean<Object>(dubboService);
             serviceConfig.setRef(bean);
-            if (void.class.equals(service.interfaceClass())
-                    && "".equals(service.interfaceName())) {
+            if (void.class.equals(dubboService.interfaceClass())
+                    && "".equals(dubboService.interfaceName())) {
                 if (bean.getClass().getInterfaces().length > 0) {
                     serviceConfig.setInterface(bean.getClass().getInterfaces()[0]);
                 } else {
@@ -144,35 +144,35 @@ public class AnnotationBean extends AbstractConfig implements DisposableBean, Be
             }
             if (applicationContext != null) {
                 serviceConfig.setApplicationContext(applicationContext);
-                if (service.registry() != null && service.registry().length > 0) {
+                if (dubboService.registry() != null && dubboService.registry().length > 0) {
                     List<RegistryConfig> registryConfigs = new ArrayList<RegistryConfig>();
-                    for (String registryId : service.registry()) {
+                    for (String registryId : dubboService.registry()) {
                         if (registryId != null && registryId.length() > 0) {
                             registryConfigs.add((RegistryConfig) applicationContext.getBean(registryId, RegistryConfig.class));
                         }
                     }
                     serviceConfig.setRegistries(registryConfigs);
                 }
-                if (service.provider() != null && service.provider().length() > 0) {
-                    serviceConfig.setProvider((ProviderConfig) applicationContext.getBean(service.provider(), ProviderConfig.class));
+                if (dubboService.provider() != null && dubboService.provider().length() > 0) {
+                    serviceConfig.setProvider((ProviderConfig) applicationContext.getBean(dubboService.provider(), ProviderConfig.class));
                 }
-                if (service.monitor() != null && service.monitor().length() > 0) {
-                    serviceConfig.setMonitor((MonitorConfig) applicationContext.getBean(service.monitor(), MonitorConfig.class));
+                if (dubboService.monitor() != null && dubboService.monitor().length() > 0) {
+                    serviceConfig.setMonitor((MonitorConfig) applicationContext.getBean(dubboService.monitor(), MonitorConfig.class));
                 }
-                if (service.application() != null && service.application().length() > 0) {
-                    serviceConfig.setApplication((ApplicationConfig) applicationContext.getBean(service.application(), ApplicationConfig.class));
+                if (dubboService.application() != null && dubboService.application().length() > 0) {
+                    serviceConfig.setApplication((ApplicationConfig) applicationContext.getBean(dubboService.application(), ApplicationConfig.class));
                 }
-                if (service.module() != null && service.module().length() > 0) {
-                    serviceConfig.setModule((ModuleConfig) applicationContext.getBean(service.module(), ModuleConfig.class));
+                if (dubboService.module() != null && dubboService.module().length() > 0) {
+                    serviceConfig.setModule((ModuleConfig) applicationContext.getBean(dubboService.module(), ModuleConfig.class));
                 }
-                if (service.provider() != null && service.provider().length() > 0) {
-                    serviceConfig.setProvider((ProviderConfig) applicationContext.getBean(service.provider(), ProviderConfig.class));
+                if (dubboService.provider() != null && dubboService.provider().length() > 0) {
+                    serviceConfig.setProvider((ProviderConfig) applicationContext.getBean(dubboService.provider(), ProviderConfig.class));
                 } else {
 
                 }
-                if (service.protocol() != null && service.protocol().length > 0) {
+                if (dubboService.protocol() != null && dubboService.protocol().length > 0) {
                     List<ProtocolConfig> protocolConfigs = new ArrayList<ProtocolConfig>();
-                    for (String protocolId : service.protocol()) {
+                    for (String protocolId : dubboService.protocol()) {
                         if (protocolId != null && protocolId.length() > 0) {
                             protocolConfigs.add((ProtocolConfig) applicationContext.getBean(protocolId, ProtocolConfig.class));
                         }

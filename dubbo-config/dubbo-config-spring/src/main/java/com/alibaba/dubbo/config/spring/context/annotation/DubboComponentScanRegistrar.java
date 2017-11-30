@@ -1,6 +1,6 @@
 package com.alibaba.dubbo.config.spring.context.annotation;
 
-import com.alibaba.dubbo.config.annotation.Service;
+import com.alibaba.dubbo.config.annotation.DubboService;
 import com.alibaba.dubbo.config.spring.ServiceBean;
 import com.alibaba.dubbo.config.spring.beans.factory.annotation.ReferenceAnnotationBeanPostProcessor;
 import com.alibaba.dubbo.config.spring.util.BeanRegistrar;
@@ -39,7 +39,7 @@ import static org.springframework.util.ClassUtils.resolveClassName;
  * Dubbo {@link DubboComponentScan} Bean Registrar
  *
  * @author <a href="mailto:mercyblitz@gmail.com">Mercy</a>
- * @see Service
+ * @see DubboService
  * @see DubboComponentScan
  * @see ImportBeanDefinitionRegistrar
  * @since 2.5.7
@@ -67,7 +67,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
     }
 
     /**
-     * Registers Beans whose classes was annotated {@link Service}
+     * Registers Beans whose classes was annotated {@link DubboService}
      *
      * @param packagesToScan The base packages to scan
      * @param registry       {@link BeanDefinitionRegistry}
@@ -77,7 +77,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
         DubboClassPathBeanDefinitionScanner dubboClassPathBeanDefinitionScanner =
                 new DubboClassPathBeanDefinitionScanner(registry, environment, resourceLoader);
 
-        dubboClassPathBeanDefinitionScanner.addIncludeFilter(new AnnotationTypeFilter(Service.class));
+        dubboClassPathBeanDefinitionScanner.addIncludeFilter(new AnnotationTypeFilter(DubboService.class));
 
         for (String packageToScan : packagesToScan) {
 
@@ -113,7 +113,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
     }
 
     /**
-     * Registers {@link ServiceBean} from new annotated {@link Service} {@link BeanDefinition}
+     * Registers {@link ServiceBean} from new annotated {@link DubboService} {@link BeanDefinition}
      *
      * @param beanDefinitionHolder
      * @param registry
@@ -124,13 +124,13 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
 
         Class<?> beanClass = resolveClass(beanDefinitionHolder);
 
-        Service service = findAnnotation(beanClass, Service.class);
+        DubboService dubboService = findAnnotation(beanClass, DubboService.class);
 
-        Class<?> interfaceClass = resolveServiceInterfaceClass(beanClass, service);
+        Class<?> interfaceClass = resolveServiceInterfaceClass(beanClass, dubboService);
 
         String beanName = beanDefinitionHolder.getBeanName();
 
-        AbstractBeanDefinition serviceBeanDefinition = buildServiceBeanDefinition(service, interfaceClass, beanName);
+        AbstractBeanDefinition serviceBeanDefinition = buildServiceBeanDefinition(dubboService, interfaceClass, beanName);
 
         registerWithGeneratedName(serviceBeanDefinition, registry);
 
@@ -161,11 +161,11 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
     }
 
 
-    private AbstractBeanDefinition buildServiceBeanDefinition(Service service, Class<?> interfaceClass,
+    private AbstractBeanDefinition buildServiceBeanDefinition(DubboService dubboService, Class<?> interfaceClass,
                                                               String annotatedServiceBeanName) {
 
         BeanDefinitionBuilder builder = rootBeanDefinition(ServiceBean.class)
-                .addConstructorArgValue(service)
+                .addConstructorArgValue(dubboService)
                 // References "ref" property to annotated-@Service Bean
                 .addPropertyReference("ref", annotatedServiceBeanName)
                 .addPropertyValue("interfaceClass", interfaceClass);
@@ -173,7 +173,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
         /**
          * Add {@link com.alibaba.dubbo.config.ProviderConfig} Bean reference
          */
-        String providerConfigBeanName = service.provider();
+        String providerConfigBeanName = dubboService.provider();
         if (StringUtils.hasText(providerConfigBeanName)) {
             addPropertyReference(builder, "provider", providerConfigBeanName);
         }
@@ -181,7 +181,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
         /**
          * Add {@link com.alibaba.dubbo.config.MonitorConfig} Bean reference
          */
-        String monitorConfigBeanName = service.monitor();
+        String monitorConfigBeanName = dubboService.monitor();
         if (StringUtils.hasText(monitorConfigBeanName)) {
             addPropertyReference(builder, "monitor", monitorConfigBeanName);
         }
@@ -189,7 +189,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
         /**
          * Add {@link com.alibaba.dubbo.config.ApplicationConfig} Bean reference
          */
-        String applicationConfigBeanName = service.application();
+        String applicationConfigBeanName = dubboService.application();
         if (StringUtils.hasText(applicationConfigBeanName)) {
             addPropertyReference(builder, "application", applicationConfigBeanName);
         }
@@ -197,7 +197,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
         /**
          * Add {@link com.alibaba.dubbo.config.ModuleConfig} Bean reference
          */
-        String moduleConfigBeanName = service.module();
+        String moduleConfigBeanName = dubboService.module();
         if (StringUtils.hasText(moduleConfigBeanName)) {
             addPropertyReference(builder, "module", moduleConfigBeanName);
         }
@@ -206,7 +206,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
         /**
          * Add {@link com.alibaba.dubbo.config.RegistryConfig} Bean reference
          */
-        String[] registryConfigBeanNames = service.registry();
+        String[] registryConfigBeanNames = dubboService.registry();
 
         List<RuntimeBeanReference> registryRuntimeBeanReferences = toRuntimeBeanReferences(registryConfigBeanNames);
 
@@ -217,7 +217,7 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
         /**
          * Add {@link com.alibaba.dubbo.config.ProtocolConfig} Bean reference
          */
-        String[] protocolConfigBeanNames = service.protocol();
+        String[] protocolConfigBeanNames = dubboService.protocol();
 
         List<RuntimeBeanReference> protocolRuntimeBeanReferences = toRuntimeBeanReferences(protocolConfigBeanNames);
 
@@ -229,15 +229,15 @@ public class DubboComponentScanRegistrar implements ImportBeanDefinitionRegistra
 
     }
 
-    private Class<?> resolveServiceInterfaceClass(Class<?> annotatedServiceBeanClass, Service service) {
+    private Class<?> resolveServiceInterfaceClass(Class<?> annotatedServiceBeanClass, DubboService dubboService) {
 
-        Class<?> interfaceClass = service.interfaceClass();
+        Class<?> interfaceClass = dubboService.interfaceClass();
 
         if (void.class.equals(interfaceClass)) {
 
             interfaceClass = null;
 
-            String interfaceClassName = service.interfaceName();
+            String interfaceClassName = dubboService.interfaceName();
 
             if (StringUtils.hasText(interfaceClassName)) {
                 if (ClassUtils.isPresent(interfaceClassName, classLoader)) {
